@@ -2,15 +2,22 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 )
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "oneline" {
+		fmt.Println(oneLine())
+
+		return
+	}
+
 	fmt.Print("\033[?47h") // save screen
 	fmt.Print("\033[H")    // move to top of screen
 	fmt.Print("\033[?25l") // make cursor invisible
 
-	for i := 0; i < 500; i++ {
+	for i := 0; i < 50000; i++ {
 		fmt.Print("   ʙɪɴᴀʀʏ ᴄʟᴏᴄᴋ\n\n")
 		fmt.Print(getClock())
 		time.Sleep(50 * time.Millisecond)
@@ -18,10 +25,59 @@ func main() {
 	}
 
 	fmt.Print("\033[?25h") // make cursor visible
-	fmt.Print("\033[?47l") // save screen
+	fmt.Print("\033[?47l") // load screen
 }
 
-func getClock() string {
+func oneLine() string {
+	str := ""
+	digits := getDigits()
+
+	str += digitToBinaryString(digits[0])
+	str += " "
+	str += digitToBinaryString(digits[1])
+	str += " : "
+	str += digitToBinaryString(digits[2])
+	str += " "
+	str += digitToBinaryString(digits[3])
+	str += " : "
+	str += digitToBinaryString(digits[4])
+	str += " "
+	str += digitToBinaryString(digits[5])
+
+	return str
+}
+
+func digitToBinaryString(digit int) string {
+	on := "1"
+	off := "0"
+
+	switch digit {
+	case 0:
+		return off + off + off + off
+	case 1:
+		return off + off + off + on
+	case 2:
+		return off + off + on + off
+	case 3:
+		return off + off + on + on
+	case 4:
+		return off + on + off + off
+	case 5:
+		return off + on + off + on
+	case 6:
+		return off + on + on + off
+	case 7:
+		return off + on + on + on
+	case 8:
+		return on + off + off + off
+	case 9:
+		return on + off + off + on
+	}
+
+	return ""
+}
+
+func getDigits() [6]int {
 	var digits [6]int
 
 	now := time.Now()
@@ -41,6 +97,12 @@ func getClock() string {
 	// second
 	digits[4] = seconds / 10
 	digits[5] = seconds % 10
+
+	return digits
+}
+
+func getClock() string {
+	digits := getDigits()
 
 	on := "🔵"
 	off := "⚪"
