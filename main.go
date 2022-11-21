@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -13,19 +15,31 @@ func main() {
 		return
 	}
 
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-quit
+		onExit()
+		os.Exit(0)
+	}()
+
 	fmt.Print("\033[?47h") // save screen
 	fmt.Print("\033[H")    // move to top of screen
 	fmt.Print("\033[?25l") // make cursor invisible
 
-	for i := 0; i < 50000; i++ {
+	for {
 		fmt.Print("   ʙɪɴᴀʀʏ ᴄʟᴏᴄᴋ\n\n")
 		fmt.Print(getClock())
 		time.Sleep(50 * time.Millisecond)
-		fmt.Print("\033[10A")
+		fmt.Print("\033[10A") // moves the cursor 10 cells in upward
 	}
+}
 
-	fmt.Print("\033[?25h") // make cursor visible
+func onExit() {
 	fmt.Print("\033[?47l") // load screen
+	fmt.Print("\033[?25h") // make cursor visible
+	fmt.Print("\033[1 q")  // make cursor blinks again
 }
 
 func oneLine() string {
