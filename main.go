@@ -15,6 +15,7 @@ func main() {
 		return
 	}
 
+	// set up signal for closing
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
